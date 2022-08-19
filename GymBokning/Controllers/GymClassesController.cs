@@ -7,22 +7,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GymBokning.Data;
 using GymBokning.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace GymBokning.Controllers
 {
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly ApplicationDbContext db;
+        private readonly ILogger<HomeController> _logger;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public GymClassesController(ApplicationDbContext context)
+        //public GymClassesController(RoleManager<IdentityRole> roleManager, ApplicationDbContext db, ILogger<GymClassesController> logger, UserManager<ApplicationUser> userManager)
+        public GymClassesController(RoleManager<IdentityRole> roleManager, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
+            this.roleManager = roleManager;
             _context = context;
+            //_logger = logger;
+            this.userManager = userManager;
         }
 
         // GET: GymClasses
         public async Task<IActionResult> Index()
         {
-              return _context.GymClasses != null ? 
+            return _context.GymClasses != null ? 
                           View(await _context.GymClasses.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.GymClasses'  is null.");
         }
@@ -158,6 +167,36 @@ namespace GymBokning.Controllers
         private bool GymClassExists(int id)
         {
           return (_context.GymClasses?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        public async Task<IActionResult> BookingToggle(int? id)
+        {
+            if (id == null) {
+                return NotFound();
+            }
+            var gymClass = await _context.GymClasses.FindAsync(id);
+
+            var userId = userManager.GetUserId(User);
+
+            var booked = _context.ApplicationUserGymClass.FirstOrDefault(x => x.GymClassId == id && x.ApplicationUserId.Equals(userId));
+
+            if (booked == null)
+            {
+                var booking = new ApplicationUserGymClass();
+                booking.GymClass = gymClass;
+                booking.GymClassId = (int)id;
+
+                booking.ApplicationUser = await userManager.FindByIdAsync(userId);
+                booking.ApplicationUserId = userId;
+                _context.ApplicationUserGymClass.Add(booking);
+            }
+            else
+            {
+                _context.Remove(booked);
+            }
+            _context.SaveChangesAsync();
+
+            return View();
         }
     }
 }
