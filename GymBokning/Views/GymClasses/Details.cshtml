@@ -37,6 +37,7 @@
     </dl>
 </div>
 
+<h4>Inbokade medlemmar</h4>
 <table>
     <tbody>
 @foreach (var member in Model.Users) {
@@ -48,6 +49,7 @@
 }
     </tbody>
 </table>
+<hr />
 
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |

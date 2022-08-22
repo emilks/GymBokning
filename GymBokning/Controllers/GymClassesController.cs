@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using GymBokning.Data;
 using GymBokning.Models.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GymBokning.Controllers
 {
@@ -16,7 +17,7 @@ namespace GymBokning.Controllers
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ApplicationDbContext db;
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<GymClassesController> _logger;
         private readonly UserManager<ApplicationUser> userManager;
 
         //public GymClassesController(RoleManager<IdentityRole> roleManager, ApplicationDbContext db, ILogger<GymClassesController> logger, UserManager<ApplicationUser> userManager)
@@ -36,6 +37,7 @@ namespace GymBokning.Controllers
                           Problem("Entity set 'ApplicationDbContext.GymClasses'  is null.");
         }
 
+        [Authorize]
         // GET: GymClasses/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -44,7 +46,7 @@ namespace GymBokning.Controllers
                 return NotFound();
             }
 
-            var gymClass = await _context.GymClasses
+            var gymClass = await _context.GymClasses.Include(n => n.Users).ThenInclude(m => m.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (gymClass == null)
             {
@@ -54,6 +56,7 @@ namespace GymBokning.Controllers
             return View(gymClass);
         }
 
+        [Authorize]
         // GET: GymClasses/Create
         public IActionResult Create()
         {
@@ -73,10 +76,17 @@ namespace GymBokning.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Select(x => x.Value.Errors)
+                                       .Where(y => y.Count > 0)
+                                       .ToList();
+            }
             return View(gymClass);
         }
 
         // GET: GymClasses/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.GymClasses == null)
@@ -128,6 +138,7 @@ namespace GymBokning.Controllers
         }
 
         // GET: GymClasses/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.GymClasses == null)
@@ -169,6 +180,7 @@ namespace GymBokning.Controllers
           return (_context.GymClasses?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
+        [Authorize]
         public async Task<IActionResult> BookingToggle(int? id)
         {
             if (id == null) {
@@ -196,7 +208,7 @@ namespace GymBokning.Controllers
             }
             _context.SaveChangesAsync();
 
-            return View();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
