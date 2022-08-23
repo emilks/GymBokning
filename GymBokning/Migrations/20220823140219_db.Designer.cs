@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GymBokning.Data.Migrations
+namespace GymBokning.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220819115806_db")]
+    [Migration("20220823140219_db")]
     partial class db
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -270,17 +270,21 @@ namespace GymBokning.Data.Migrations
 
             modelBuilder.Entity("GymBokning.Models.Entities.ApplicationUserGymClass", b =>
                 {
-                    b.HasOne("GymBokning.Models.Entities.ApplicationUser", null)
+                    b.HasOne("GymBokning.Models.Entities.ApplicationUser", "ApplicationUser")
                         .WithMany("Classes")
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymBokning.Models.Entities.GymClass", null)
+                    b.HasOne("GymBokning.Models.Entities.GymClass", "GymClass")
                         .WithMany("Users")
                         .HasForeignKey("GymClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("GymClass");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

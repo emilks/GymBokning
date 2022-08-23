@@ -206,7 +206,7 @@ namespace GymBokning.Controllers
             {
                 _context.Remove(booked);
             }
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
