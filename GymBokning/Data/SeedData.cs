@@ -71,7 +71,7 @@ namespace GymBokning.Data
 
             if (found != null) return null!;
 
-            var admin = new ApplicationUser { UserName = email, Email = email };
+            var admin = new ApplicationUser { UserName = email, Email = email, FirstName = "Admin", LastName = "Adminson" };
 
             var result = await userManager.CreateAsync(admin, PW);
             if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));

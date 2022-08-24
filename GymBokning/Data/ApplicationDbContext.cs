@@ -21,6 +21,8 @@ namespace GymBokning.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ApplicationUserGymClass>().HasKey(t => new {t.ApplicationUserId, t.GymClassId});
+
+            //modelBuilder.Entity<ApplicationUser>().Property<DateTime>("TimeOfRegistration");
         }
 
     }

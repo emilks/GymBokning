@@ -43,7 +43,7 @@
 @foreach (var member in Model.Users) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => member.ApplicationUser.Email)
+                @Html.DisplayFor(modelItem => member.ApplicationUser.FullName)
             </td>
         </tr>
 }
