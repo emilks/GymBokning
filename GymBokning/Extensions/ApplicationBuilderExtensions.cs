@@ -17,7 +17,7 @@ namespace GymBokning.Extensions
 
                 //dotnet user-secrets set "AdminPW" "BytMig123!"
                 var config = serviceProvider.GetRequiredService<IConfiguration>();
-                var adminPW = "Placeholder";// config["AdminPW"];
+                var adminPW = config["AdminPW"];
 
                 try
                 {

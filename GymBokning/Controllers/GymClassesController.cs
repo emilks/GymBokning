@@ -33,8 +33,45 @@ namespace GymBokning.Controllers
         public async Task<IActionResult> Index()
         {
             return _context.GymClasses != null ? 
-                          View(await _context.GymClasses.ToListAsync()) :
+                          View(await _context.GymClasses
+                          .Include(m => m.Users)
+                          .Where(n => n.StartTime > DateTime.Now)
+                          .ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.GymClasses'  is null.");
+        }
+
+        public async Task<IActionResult> OldIndex()
+        {
+            
+            var passes = await _context.GymClasses.Include(m => m.Users).Where(n => n.StartTime < DateTime.Now).ToListAsync();
+
+
+            return View(nameof(Index), passes);
+        }
+
+        public async Task<IActionResult> Bookings()
+        {
+            var user = userManager.GetUserId(User);
+
+            var passes = await _context.GymClasses.Include(m => m.Users)
+                .Where(m => m.Users.Any(n => n.ApplicationUserId == user))
+                .Where(m => m.StartTime > DateTime.Now)
+                .ToListAsync();
+
+
+            return View(passes);
+        }
+
+        public async Task<IActionResult> OldBookings()
+        {
+            var user = userManager.GetUserId(User);
+
+            var passes = await _context.GymClasses.Include(m => m.Users)
+                .Where(m => m.Users.Any(n => n.ApplicationUserId == user))
+                .Where(m => m.StartTime < DateTime.Now)
+                .ToListAsync();
+
+            return View(nameof(Bookings), passes);
         }
 
         [Authorize]

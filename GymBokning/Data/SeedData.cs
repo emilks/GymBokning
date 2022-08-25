@@ -36,7 +36,7 @@ namespace GymBokning.Data
 
             var roleNames = new[] { "Member", "Admin" };
             var adminEmail = "admin@gymbokning.com";
-            adminPW = "Admin123!";
+            //adminPW = "Admin123!";
 
             await AddRolesAsync(roleNames);
 
